@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>shopsy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to bottom right, #f5f5f5, #e8eaf6);
+      color: #333;
+    }
+    header {
+      background-color: #3f51b5;
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    header h1 { font-size: 24px; }
+
+    .filters {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    select, input[type="text"] {
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-family: 'Poppins';
+    }
+    .view-cart-btn {
+      background-color: #ff9800;
+      border: none;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    section.products {
+      padding: 20px;
+    }
+    h2 {
+      text-align: center;
+      color: #3f51b5;
+      margin-bottom: 20px;
+    }
+
+    .products-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .product {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      padding: 15px;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .product:hover {
+      transform: translateY(-5px);
+    }
+    .product img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .product h3 {
+      margin: 10px 0 5px;
+      font-size: 18px;
+      color: #1a237e;
+    }
+    .product p {
+      margin: 5px 0;
+      font-weight: 500;
+      color: #444;
+    }
+    .product button {
+      padding: 8px 16px;
+      background: #3949ab;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .product button:hover {
+      background: #1a237e;
+    }
+
+    /* Modal Cart Styling */
+    #cartModal {
+      display: none;
+      position: fixed;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 500px;
+      background: #ffffff;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      padding: 20px;
+      border-radius: 10px;
+      z-index: 1000;
+    }
+
+    #cartModal h2 {
+      margin-bottom: 15px;
+      text-align: center;
+      color: #3f51b5;
+    }
+
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    .cart-item button {
+      background-color: #f44336;
+      border: none;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .order-btn {
+      margin-top: 15px;
+      padding: 12px 25px;
+      background: #43a047;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      display: block;
+      width: 100%;
+    }
+
+    .order-btn:hover {
+      background: #2e7d32;
+    }
+
+    .close-btn {
+      background: #9e9e9e;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 6px 10px;
+      float: right;
+      margin-top: -10px;
+      margin-right: -10px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 600px) {
+      .filters {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🛍️ shopsy</h1>
+  <div class="filters">
+    <input type="text" id="searchInput" placeholder="Search products..." oninput="filterProducts()">
+    <select id="categoryFilter" onchange="filterProducts()">
+      <option value="all">All Categories</option>
+      <option value="fashion">Fashion</option>
+      <option value="electronics">Electronics</option>
+      <option value="books">Books</option>
+      <option value="necklace">Necklace</option>
+    </select>
+    <select id="priceFilter" onchange="filterProducts()">
+      <option value="all">All Prices</option>
+      <option value="100">Below ₹100</option>
+      <option value="500">Below ₹500</option>
+      <option value="1000">Below ₹1000</option>
+      <option value="5000">Above ₹5000</option>
+    </select>
+    <button class="view-cart-btn" onclick="toggleCart()">🛒 View Cart</button>
+  </div>
+</header>
+
+<section class="products">
+  <h2>Explore Products</h2>
+  <div class="products-container" id="productsContainer">
+    <!-- Insert your product cards here (use same format as before) -->
+    <!-- Example -->
+    <div class="product" data-category="fashion" data-price="299">
+      <img src="dress1.jpg" alt="Fashion Item">
+      <h3>Frock</h3>
+      <p>₹299</p>
+      <button onclick="addToCart('Frock', 299)">Add to Cart</button>
+    </div>
+    <div class="product" data-category="fashion" data-price="199">
+      <img src="dress2.jpg" alt="Fashion Item">
+      <h3>frock stylish pink</h3>
+      <p>₹199</p>
+      <button onclick="addToCart('frock stylish pink', 199)">Add to Cart</button>
+    </div>
+<div class="product" data-category="fashion" data-price="399">
+      <img src="dress3.jpg" alt="Fashion Item">
+      <h3> elegant frock</h3>
+      <p>₹399</p>
+      <button onclick="addToCart('eligant frock', 399)">Add to Cart</button>
+    </div>
+<div class="product" data-category="fashion" data-price="259">
+      <img src="dress 4.jpg" alt="Fashion Item">
+      <h3> summer stylish frock</h3>
+      <p>₹259</p>
+      <button onclick="addToCart(' summer Stylish frock', 259)">Add to Cart</button>
+    </div>
+<div class="product" data-category="fashion" data-price="599">
+      <img src="dress 5.jpg" alt="Fashion Item">
+      <h3>elegant traditional</h3>
+      <p>₹599</p>
+      <button onclick="addToCart('elegant traditional', 599)">Add to Cart</button>
+    </div>
+<div class="product" data-category="fashion" data-price="299">
+      <img src="dress 6.jpg" alt="Fashion Item">
+      <h3>black print frock</h3>
+      <p>₹299</p>
+      <button onclick="addToCart('black print frock', 299)">Add to Cart</button>
+    </div>
+<div class="product" data-category="fashion" data-price="499">
+      <img src="dress 8.jpg" alt="Fashion Item">
+      <h3>party wear frock</h3>
+      <p>₹499</p>
+      <button onclick="addToCart('party wear', 499)">Add to Cart</button>
+    </div>
+
+    <div class="product" data-category="electronics" data-price="19999">
+      <img src="a.jpg" alt="Electronics">
+      <h3>Galaxy A36</h3>
+      <p>₹19999</p>
+      <button onclick="addToCart('Galaxy A36', 19999)">Add to Cart</button>
+    </div>
+<div class="product" data-category="electronics" data-price="29999">
+      <img src="v.jpg" alt="Electronics">
+      <h3>redmi</h3>
+      <p>₹29999</p>
+      <button onclick="addToCart('redmi', 29999)">Add to Cart</button>
+    </div>
+<div class="product" data-category="electronics" data-price="19999">
+      <img src="d.jpg" alt="Electronics">
+      <h3>realmi</h3>
+      <p>₹19999</p>
+      <button onclick="addToCart('realmi', 19999)">Add to Cart</button>
+    </div>
+<div class="product" data-category="electronics" data-price="1999">
+      <img src="n.jpg" alt="Electronics">
+      <h3>airpods</h3>
+      <p>₹1999</p>
+      <button onclick="addToCart('airpods', 1999)">Add to Cart</button>
+    </div>
+<div class="product" data-category="electronics" data-price="1999">
+      <img src="e.jpg" alt="Electronics">
+      <h3>hp laptop</h3>
+      <p>₹59999</p>
+      <button onclick="addToCart('hp laptop', 59999)">Add to Cart</button>
+    </div>
+
+
+
+    <div class="product" data-category="books" data-price="199">
+      <img src="screenshot (55).jpg" alt="Book">
+      <h3>great unknoown Book</h3>
+      <p>₹199</p>
+      <button onclick="addToCart('great unknown Book', 199)">Add to Cart</button>
+    </div>
+<div class="product" data-category="books" data-price="299">
+      <img src="screenshot (56).jpg" alt="Book">
+      <h3>physcology of money Book</h3>
+      <p>₹299</p>
+      <button onclick="addToCart('phucology of money', 299)">Add to Cart</button>
+    </div>
+<div class="product" data-category="books" data-price="99">
+      <img src="screenshot (57).jpg" alt="Book">
+      <h3>good girls guide</h3>
+      <p>₹99</p>
+      <button onclick="addToCart('good girls guide', 99)">Add to Cart</button>
+    </div>
+<div class="product" data-category="books" data-price="199">
+      <img src="screenshot (59).jpg" alt="Book">
+      <h3>she is hauting</h3>
+      <p>₹199</p>
+      <button onclick="addToCart('she is hauting', 199)">Add to Cart</button>
+    </div>
+<div class="product" data-category="necklace" data-price="199">
+      <img src="screenshot (3).jpg" alt="necklace">
+      <h3>stylish locket chain</h3>
+      <p>₹199</p>
+      <button onclick="addToCart('stylish locket chain', 199)">Add to Cart</button>
+    </div>
+<div class="product" data-category="necklace" data-price="99">
+      <img src="screenshot (4).jpg" alt="necklace">
+      <h3>simple chain</h3>
+      <p>₹99</p>
+      <button onclick="addToCart('simple chain', 99)">Add to Cart</button>
+    </div>
+<div class="product" data-category="necklace" data-price="299">
+      <img src="screenshot (5).jpg" alt="necklace">
+      <h3>evel eye chain</h3>
+      <p>₹299</p>
+      <button onclick="addToCart('evel eye chain', 299)">Add to Cart</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- Cart Modal Popup -->
+<div id="cartModal">
+  <button class="close-btn" onclick="toggleCart()">✖</button>
+  <h2>🛒 View Cart</h2>
+  <div id="cartItems"></div>
+  <p><strong>Total:</strong> ₹<span id="cartTotal">0</span></p>
+  <button class="order-btn" onclick="placeOrder()">Place Order</button>
+</div>
+
+<script>
+  const cart = [];
+
+  function addToCart(name, price) {
+    cart.push({ name, price });
+    updateCart();
+    alert(`${name} added to cart!`);
+  }
+
+  function updateCart() {
+    const cartItems = document.getElementById("cartItems");
+    cartItems.innerHTML = "";
+    let total = 0;
+    cart.forEach((item, index) => {
+      const div = document.createElement("div");
+      div.className = "cart-item";
+      div.innerHTML = `<span>${item.name} - ₹${item.price}</span> 
+                       <button onclick="removeFromCart(${index})">Delete</button>`;
+      cartItems.appendChild(div);
+      total += item.price;
+    });
+    document.getElementById("cartTotal").innerText = total;
+  }
+
+  function removeFromCart(index) {
+    cart.splice(index, 1);
+    updateCart();
+  }
+
+  function placeOrder() {
+    if (cart.length === 0) {
+      alert("🛒 Your cart is empty!");
+      return;
+    }
+    alert("🎉 Your order has been placed successfully!");
+    cart.length = 0;
+    updateCart();
+    toggleCart();
+  }
+
+  function filterProducts() {
+    const searchValue = document.getElementById("searchInput").value.toLowerCase();
+    const selectedCategory = document.getElementById("categoryFilter").value;
+    const selectedPrice = document.getElementById("priceFilter").value;
+    const products = document.querySelectorAll(".product");
+
+    products.forEach(product => {
+      const title = product.querySelector("h3").innerText.toLowerCase();
+      const category = product.getAttribute("data-category");
+      const price = parseInt(product.getAttribute("data-price"));
+      const matchesSearch = title.includes(searchValue);
+      const matchesCategory = selectedCategory === "all" || category === selectedCategory;
+      const matchesPrice = selectedPrice === "all" || price <= parseInt(selectedPrice);
+      product.style.display = (matchesSearch && matchesCategory && matchesPrice) ? "block" : "none";
+    });
+  }
+
+  function toggleCart() {
+    const cartModal = document.getElementById("cartModal");
+    cartModal.style.display = cartModal.style.display === "block" ? "none" : "block";
+  }
+</script>
+
+</body>
+</html>
+
+
+
